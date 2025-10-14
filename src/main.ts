@@ -129,7 +129,9 @@ buttonRedo.innerHTML = "REDO";
 document.body.append(buttonRedo);
 
 buttonRedo.addEventListener("click", () => {
-  lines.push(linesUndone.pop()!);
+  if (linesUndone.length > 0) {
+    lines.push(linesUndone.pop()!);
 
-  notify("drawing-changed");
+    notify("drawing-changed");
+  }
 });
