@@ -115,3 +115,21 @@ buttonClear.addEventListener("click", () => {
 const buttonUndo = document.createElement("button");
 buttonUndo.innerHTML = "UNDO";
 document.body.append(buttonUndo);
+
+buttonUndo.addEventListener("click", () => {
+  if (lines.length > 0) {
+    linesUndone.push(lines.pop()!);
+
+    notify("drawing-changed");
+  }
+});
+
+const buttonRedo = document.createElement("button");
+buttonRedo.innerHTML = "REDO";
+document.body.append(buttonRedo);
+
+buttonRedo.addEventListener("click", () => {
+  lines.push(linesUndone.pop()!);
+
+  notify("drawing-changed");
+});
