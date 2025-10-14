@@ -111,3 +111,7 @@ buttonClear.addEventListener("click", () => {
   lines.length = 0;
   linesUndone.length = 0;
 });
+
+const buttonUndo = document.createElement("button");
+buttonUndo.innerHTML = "UNDO";
+document.body.append(buttonUndo);
