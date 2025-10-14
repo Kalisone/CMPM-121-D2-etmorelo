@@ -5,43 +5,40 @@ document.body.innerHTML = `
   <hr><br>
   <canvas id="canvasMain" width="256" height="256"></canvas>
   <br><br>
-  <button id="buttonClear">Clear Canvas</button>
+  <button id="buttonClear">Clear</button>
 `;
 
 const canvas = document.getElementById("canvasMain") as HTMLCanvasElement;
 const context = canvas.getContext("2d")!;
-const clear = document.getElementById("buttonClear")!;
-
-let isDrawing: boolean = false;
-let x = 0;
-let y = 0;
+const clearButton = document.getElementById("buttonClear")!;
+const cursor = { isDrawing: false, x: 0, y: 0 };
 
 // Draw in canvas
 canvas.addEventListener("mousedown", (e) => {
-  x = e.offsetX;
-  y = e.offsetY;
-  isDrawing = true;
+  cursor.x = e.offsetX;
+  cursor.y = e.offsetY;
+  cursor.isDrawing = true;
 });
 
 canvas.addEventListener("mousemove", (e) => {
-  if (isDrawing) {
-    drawLine(context, x, y, e.offsetX, e.offsetY);
-    x = e.offsetX;
-    y = e.offsetY;
+  if (cursor.isDrawing) {
+    drawLine(context, cursor.x, cursor.y, e.offsetX, e.offsetY);
+    cursor.x = e.offsetX;
+    cursor.y = e.offsetY;
   }
 });
 
 canvas.addEventListener("mouseup", (e) => {
-  if (isDrawing) {
-    drawLine(context, x, y, e.offsetX, e.offsetY);
-    x = 0;
-    y = 0;
+  if (cursor.isDrawing) {
+    drawLine(context, cursor.x, cursor.y, e.offsetX, e.offsetY);
+    cursor.x = 0;
+    cursor.y = 0;
   }
 
-  isDrawing = false;
+  cursor.isDrawing = false;
 });
 
-clear.addEventListener("click", () => {
+clearButton.addEventListener("click", () => {
   context.clearRect(0, 0, canvas.width, canvas.height);
 });
 
