@@ -2,15 +2,16 @@ import "./style.css";
 
 document.body.innerHTML = `
   <h1>CMPM 121 D2</h1>
-  <hr><br>
-  <canvas id="canvasMain" width="256" height="256"></canvas>
-  <br><br>
-  <button id="buttonClear">Clear</button>
+  <hr>
 `;
 
-const canvas = document.getElementById("canvasMain") as HTMLCanvasElement;
+const canvas = document.createElement("canvas");
+canvas.width = 256;
+canvas.height = 256;
+canvas.classList.add("canvas");
+document.body.append(canvas);
+
 const context = canvas.getContext("2d")!;
-const clearButton = document.getElementById("buttonClear")!;
 const cursor = { isDrawing: false, x: 0, y: 0 };
 
 // Draw in canvas
@@ -37,6 +38,12 @@ canvas.addEventListener("mouseup", (e) => {
 
   cursor.isDrawing = false;
 });
+
+document.body.append(document.createElement("br"));
+
+const clearButton = document.createElement("button");
+clearButton.innerHTML = "clear";
+document.body.append(clearButton);
 
 clearButton.addEventListener("click", () => {
   context.clearRect(0, 0, canvas.width, canvas.height);
