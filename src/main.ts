@@ -1,6 +1,6 @@
-import exampleIconUrl from "./noun-paperclip-7598668-00449F.png";
 import "./style.css";
 
 document.body.innerHTML = `
-  <p>Example image asset: <img src="${exampleIconUrl}" class="icon" /></p>
+  <h1>CMPM 121 D2</h1>
+  <canvas id="canvasMain" width="256" height="256"></canvas>
 `;
