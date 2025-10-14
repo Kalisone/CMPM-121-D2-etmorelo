@@ -1,8 +1,8 @@
 import "./style.css";
 
 document.body.innerHTML = `
-  <h1>CMPM 121 D2</h1>
-  <hr>
+  <h1>Pinta Lite</h1>
+  <hr><br>
 `;
 
 /* **** **** **** ****
@@ -23,38 +23,13 @@ let lineCurrent: { x: number; y: number }[] | null = null;
 
 const cursor = { isDrawing: false, x: 0, y: 0 };
 
-// Draw in canvas
-canvas.addEventListener("mousedown", (e) => {
-  cursor.x = e.offsetX;
-  cursor.y = e.offsetY;
-  cursor.isDrawing = true;
+function notify(name: string) {
+  canvas.dispatchEvent(new Event(name));
+}
 
-  lineCurrent = [];
-  lines.push(lineCurrent);
-  linesUndone.splice(0, linesUndone.length);
-  lineCurrent.push({ x: cursor.x, y: cursor.y });
+let isDirty: boolean = true;
 
-  drawLine();
-});
-
-canvas.addEventListener("mousemove", (e) => {
-  if (cursor.isDrawing) {
-    cursor.x = e.offsetX;
-    cursor.y = e.offsetY;
-    lineCurrent?.push({ x: cursor.x, y: cursor.y });
-
-    drawLine();
-  }
-});
-
-canvas.addEventListener("mouseup", () => {
-  cursor.isDrawing = false;
-  lineCurrent = null;
-
-  drawLine();
-});
-
-function drawLine() {
+function redraw() {
   context.clearRect(0, 0, canvas.width, canvas.height);
 
   for (const line of lines) {
@@ -73,33 +48,66 @@ function drawLine() {
       context.stroke();
     }
   }
+
+  isDirty = false;
 }
-/*
-function drawLine(
-  context: CanvasRenderingContext2D,
-  x1: number,
-  y1: number,
-  x2: number,
-  y2: number,
-) {
-  context.beginPath();
-  context.strokeStyle = "black";
-  context.lineWidth = 2;
-  context.moveTo(x1, y1);
-  context.lineTo(x2, y2);
-  context.stroke();
-  context.closePath();
+
+function markDirty() {
+  if (!isDirty) {
+    isDirty = true;
+    redraw();
+  }
 }
-*/
-document.body.append(document.createElement("br"));
+
+canvas.addEventListener("drawing-changed", markDirty);
+
+redraw();
+
+// Draw in canvas
+canvas.addEventListener("mousedown", (e) => {
+  cursor.x = e.offsetX;
+  cursor.y = e.offsetY;
+  cursor.isDrawing = true;
+
+  lineCurrent = [];
+  lines.push(lineCurrent);
+  linesUndone.splice(0, linesUndone.length);
+  lineCurrent.push({ x: cursor.x, y: cursor.y });
+
+  notify("drawing-changed");
+});
+
+canvas.addEventListener("mousemove", (e) => {
+  if (cursor.isDrawing) {
+    cursor.x = e.offsetX;
+    cursor.y = e.offsetY;
+    lineCurrent?.push({ x: cursor.x, y: cursor.y });
+
+    notify("drawing-changed");
+  }
+});
+
+canvas.addEventListener("mouseup", () => {
+  cursor.isDrawing = false;
+  lineCurrent = null;
+
+  notify("drawing-changed");
+});
+
+document.body.append(
+  document.createElement("br"),
+  document.createElement("br"),
+);
 
 /* **** **** **** ****
  * BUTTONS
  * **** **** **** ****/
 const buttonClear = document.createElement("button");
-buttonClear.innerHTML = "clear";
+buttonClear.innerHTML = "CLEAR";
 document.body.append(buttonClear);
 
 buttonClear.addEventListener("click", () => {
   context.clearRect(0, 0, canvas.width, canvas.height);
+  lines.length = 0;
+  linesUndone.length = 0;
 });
