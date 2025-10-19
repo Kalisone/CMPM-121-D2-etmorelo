@@ -54,15 +54,6 @@ class CommandLine {
 const commands: CommandLine[] = [];
 const commandsUndone: CommandLine[] = [];
 
-/* DELETE */
-//const lines: { x: number; y: number }[][] = [];
-//const linesUndone: { x: number; y: number }[][] = [];
-
-//let lineCurrent: { x: number; y: number }[] | null = null;
-
-//const cursor = { isDrawing: false, x: 0, y: 0 };
-/* END DELETE */
-
 /* **** **** **** ****
  * FUNCTIONS
  * **** **** **** ****/
@@ -74,28 +65,7 @@ let isDirty: boolean = true;
 
 function redraw() {
   context.clearRect(0, 0, canvas.width, canvas.height);
-
   commands.forEach((command) => command.display(context));
-
-  /*
-  for (const line of lines) {
-    if (line.length > 1) {
-      context.beginPath();
-
-      if (line[0]) {
-        const { x, y } = line[0];
-        context.moveTo(x, y);
-      }
-
-      for (const { x, y } of line) {
-        context.lineTo(x, y);
-      }
-
-      context.stroke();
-    }
-  }
-  */
-
   isDirty = false;
 }
 
@@ -116,16 +86,6 @@ redraw();
  * **** **** **** ****/
 // Draw in canvas
 canvas.addEventListener("mousedown", (e) => {
-  /*
-  cursor.x = e.offsetX;
-  cursor.y = e.offsetY;
-  cursor.isDrawing = true;
-
-  lineCurrent = [];
-  lines.push(lineCurrent);
-  linesUndone.splice(0, linesUndone.length);
-  lineCurrent.push({ x: cursor.x, y: cursor.y });
-  */
   lineCommandCurrent = new CommandLine(e.offsetX, e.offsetY);
   commands.push(lineCommandCurrent);
   commandsUndone.splice(0, commandsUndone.length);
@@ -135,11 +95,6 @@ canvas.addEventListener("mousedown", (e) => {
 
 canvas.addEventListener("mousemove", (e) => {
   if (e.buttons == 1) {
-    /*
-    cursor.x = e.offsetX;
-    cursor.y = e.offsetY;
-    lineCurrent?.push({ x: cursor.x, y: cursor.y });
-    */
     lineCommandCurrent!.points.push({ x: e.offsetX, y: e.offsetY });
 
     notify("drawing-changed");
@@ -147,7 +102,6 @@ canvas.addEventListener("mousemove", (e) => {
 });
 
 canvas.addEventListener("mouseup", () => {
-  //cursor.isDrawing = false;
   lineCommandCurrent = null;
 
   notify("drawing-changed");
@@ -166,12 +120,9 @@ buttonClear.innerHTML = "CLEAR";
 document.body.append(buttonClear);
 
 buttonClear.addEventListener("click", () => {
-  /*
-  context.clearRect(0, 0, canvas.width, canvas.height);
-  lines.length = 0;
-  linesUndone.length = 0;
-  */
   commands.splice(0, commands.length);
+  commandsUndone.splice(0, commandsUndone.length);
+
   notify("drawing-changed");
 });
 
