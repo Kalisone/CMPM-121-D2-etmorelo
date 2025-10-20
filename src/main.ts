@@ -142,11 +142,20 @@ document.body.append(
 /* **** **** **** ****
  * BUTTONS
  * **** **** **** ****/
+const buttons_markerThickness: HTMLButtonElement[] = [];
+
 const buttonMarkerThin = document.createElement("button");
 buttonMarkerThin.innerHTML = "THIN";
 document.body.append(buttonMarkerThin);
+buttons_markerThickness.push(buttonMarkerThin);
+buttonMarkerThin.classList.add("selectedTool");
 
 buttonMarkerThin.addEventListener("click", () => {
+  for (const button of buttons_markerThickness) {
+    button.classList.remove("selectedTool");
+  }
+
+  buttonMarkerThin.classList.add("selectedTool");
   markerCommandCurrent = markerCommandThin;
 
   notify("drawing-changed");
@@ -155,8 +164,14 @@ buttonMarkerThin.addEventListener("click", () => {
 const buttonMarkerThick = document.createElement("button");
 buttonMarkerThick.innerHTML = "THICK";
 document.body.append(buttonMarkerThick);
+buttons_markerThickness.push(buttonMarkerThick);
 
 buttonMarkerThick.addEventListener("click", () => {
+  for (const button of buttons_markerThickness) {
+    button.classList.remove("selectedTool");
+  }
+
+  buttonMarkerThick.classList.add("selectedTool");
   markerCommandCurrent = markerCommandThick;
 
   notify("drawing-changed");

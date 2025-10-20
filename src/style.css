@@ -16,3 +16,9 @@ button {
   font-size: 18px;
   font-family: "Monaco", monospace;
 }
+
+.selectedTool {
+  background-color: #f0f0ff;
+  border-color: #2a2a36;
+  color: #000000;
+}
