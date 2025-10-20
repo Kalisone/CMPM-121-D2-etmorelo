@@ -20,10 +20,10 @@ const context = canvas.getContext("2d")!;
  * COMMANDS
  * **** **** **** ****/
 class CommandLine {
-  points: { x: number; y: number }[];
+  points: { x: number; y: number; lw: number }[];
 
-  constructor(x: number, y: number) {
-    this.points = [{ x, y }];
+  constructor(x: number, y: number, lw: number) {
+    this.points = [{ x, y, lw }];
   }
 
   display(context: CanvasRenderingContext2D) {
@@ -32,22 +32,22 @@ class CommandLine {
     }
 
     context.strokeStyle = "black";
-    context.lineWidth = markerCommand.Thickness;
     context.beginPath();
 
-    const { x, y } = this.points[0];
+    const { x, y } = { x: this.points[0].x, y: this.points[0].y };
 
     context.moveTo(x, y);
 
-    for (const { x, y } of this.points.slice(1)) {
+    for (const { x, y, lw } of this.points.slice(1)) {
+      context.lineWidth = lw;
       context.lineTo(x, y);
     }
 
     context.stroke();
   }
 
-  grow(x: number, y: number) {
-    this.points.push({ x, y });
+  grow(x: number, y: number, lw: number) {
+    this.points.push({ x, y, lw });
   }
 }
 
@@ -69,7 +69,8 @@ class CommandMarker {
 
 const lineCommands: CommandLine[] = [];
 const lineCommandsUndone: CommandLine[] = [];
-const markerCommand: CommandMarker = new CommandMarker(2);
+const markerCommandThin: CommandMarker = new CommandMarker(2);
+const markerCommandThick: CommandMarker = new CommandMarker(4);
 
 /* **** **** **** ****
  * FUNCTIONS
@@ -95,6 +96,7 @@ function markDirty() {
 
 canvas.addEventListener("drawing-changed", markDirty);
 let lineCommandCurrent: CommandLine | null = null;
+let markerCommandCurrent: CommandMarker = markerCommandThin;
 
 redraw();
 
@@ -103,7 +105,11 @@ redraw();
  * **** **** **** ****/
 // Draw in canvas
 canvas.addEventListener("mousedown", (e) => {
-  lineCommandCurrent = new CommandLine(e.offsetX, e.offsetY);
+  lineCommandCurrent = new CommandLine(
+    e.offsetX,
+    e.offsetY,
+    markerCommandCurrent.Thickness,
+  );
   lineCommands.push(lineCommandCurrent);
   lineCommandsUndone.splice(0, lineCommandsUndone.length);
 
@@ -112,7 +118,11 @@ canvas.addEventListener("mousedown", (e) => {
 
 canvas.addEventListener("mousemove", (e) => {
   if (e.buttons == 1) {
-    lineCommandCurrent!.points.push({ x: e.offsetX, y: e.offsetY });
+    lineCommandCurrent!.points.push({
+      x: e.offsetX,
+      y: e.offsetY,
+      lw: markerCommandCurrent.Thickness,
+    });
 
     notify("drawing-changed");
   }
@@ -137,7 +147,7 @@ buttonMarkerThin.innerHTML = "THIN";
 document.body.append(buttonMarkerThin);
 
 buttonMarkerThin.addEventListener("click", () => {
-  markerCommand.Thickness = 2;
+  markerCommandCurrent = markerCommandThin;
 
   notify("drawing-changed");
 });
@@ -147,7 +157,7 @@ buttonMarkerThick.innerHTML = "THICK";
 document.body.append(buttonMarkerThick);
 
 buttonMarkerThick.addEventListener("click", () => {
-  markerCommand.Thickness = 4;
+  markerCommandCurrent = markerCommandThick;
 
   notify("drawing-changed");
 });
