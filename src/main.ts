@@ -77,9 +77,10 @@ class CommandCursor {
     this.y = y;
   }
 
-  display(context: CanvasRenderingContext2D) {
+  draw(context: CanvasRenderingContext2D) {
     context.beginPath();
-    context.arc(this.x, this.y, 2, 0, 2 * Math.PI);
+    context.arc(this.x, this.y, markerCommandCurrent.Thickness, 0, 2 * Math.PI);
+    context.lineWidth = 1;
     context.stroke();
   }
 }
@@ -104,7 +105,7 @@ function redraw() {
   lineCommands.forEach((command) => command.display(context));
 
   if (cursorCommand) {
-    cursorCommand.display(context);
+    cursorCommand.draw(context);
   }
 
   isDirty = false;
@@ -126,7 +127,7 @@ let markerCommandCurrent: CommandMarker = markerCommandThin;
 redraw();
 
 /* **** **** **** ****
- * EVENT LISTENERS
+ * CANVAS CHANGES (EVENT LISTENERS)
  * **** **** **** ****/
 // DRAWING IN CANVAS
 // Click
@@ -187,6 +188,7 @@ document.body.append(
 /* **** **** **** ****
  * BUTTONS
  * **** **** **** ****/
+// MARKER STYLING
 const buttons_markerThickness: HTMLButtonElement[] = [];
 
 const buttonMarkerThin = document.createElement("button");
@@ -224,6 +226,7 @@ buttonMarkerThick.addEventListener("click", () => {
 
 document.body.append(document.createElement("br"));
 
+// ACTION CHANGES (CLEAR, UNDO, REDO)
 const buttonClear = document.createElement("button");
 buttonClear.innerHTML = "CLEAR";
 document.body.append(buttonClear);
