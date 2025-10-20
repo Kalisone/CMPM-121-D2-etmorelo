@@ -118,6 +118,18 @@ function markDirty() {
   }
 }
 
+function switchSelectedButton(
+  selected: HTMLButtonElement,
+  buttons: HTMLButtonElement[],
+  classListName: string,
+) {
+  for (const button of buttons) {
+    button.classList.remove(classListName);
+  }
+
+  selected.classList.add(classListName);
+}
+
 canvas.addEventListener("drawing-changed", markDirty);
 canvas.addEventListener("tool-moved", markDirty);
 
@@ -188,21 +200,17 @@ document.body.append(
 /* **** **** **** ****
  * BUTTONS
  * **** **** **** ****/
-// MARKER STYLING
-const buttons_markerThickness: HTMLButtonElement[] = [];
+// MARKER STYLING (LINE THICKNESS)
+const buttons_markerTool: HTMLButtonElement[] = [];
 
 const buttonMarkerThin = document.createElement("button");
 buttonMarkerThin.innerHTML = "THIN";
 document.body.append(buttonMarkerThin);
-buttons_markerThickness.push(buttonMarkerThin);
+buttons_markerTool.push(buttonMarkerThin);
 buttonMarkerThin.classList.add("selectedTool");
 
 buttonMarkerThin.addEventListener("click", () => {
-  for (const button of buttons_markerThickness) {
-    button.classList.remove("selectedTool");
-  }
-
-  buttonMarkerThin.classList.add("selectedTool");
+  switchSelectedButton(buttonMarkerThin, buttons_markerTool, "selectedTool");
   markerCommandCurrent = markerCommandThin;
 
   notify("drawing-changed");
@@ -211,20 +219,28 @@ buttonMarkerThin.addEventListener("click", () => {
 const buttonMarkerThick = document.createElement("button");
 buttonMarkerThick.innerHTML = "THICK";
 document.body.append(buttonMarkerThick);
-buttons_markerThickness.push(buttonMarkerThick);
+buttons_markerTool.push(buttonMarkerThick);
 
 buttonMarkerThick.addEventListener("click", () => {
-  for (const button of buttons_markerThickness) {
-    button.classList.remove("selectedTool");
-  }
-
-  buttonMarkerThick.classList.add("selectedTool");
+  switchSelectedButton(buttonMarkerThick, buttons_markerTool, "selectedTool");
   markerCommandCurrent = markerCommandThick;
 
   notify("drawing-changed");
 });
 
 document.body.append(document.createElement("br"));
+
+// MARKER STICKERS (EMOJIS)
+const buttonStickerCookie = document.createElement("button");
+buttonStickerCookie.innerHTML = "🍪";
+document.body.append(buttonStickerCookie);
+buttons_markerTool.push(buttonStickerCookie);
+
+document.body.append(document.createElement("br"));
+
+buttonStickerCookie.addEventListener("click", () => {
+  switchSelectedButton(buttonStickerCookie, buttons_markerTool, "selectedTool");
+});
 
 // ACTION CHANGES (CLEAR, UNDO, REDO)
 const buttonClear = document.createElement("button");
