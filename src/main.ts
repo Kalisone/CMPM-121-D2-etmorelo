@@ -32,7 +32,7 @@ class CommandLine {
     }
 
     context.strokeStyle = "black";
-    context.lineWidth = 4;
+    context.lineWidth = markerCommand.Thickness;
     context.beginPath();
 
     const { x, y } = this.points[0];
@@ -51,8 +51,25 @@ class CommandLine {
   }
 }
 
-const commands: CommandLine[] = [];
-const commandsUndone: CommandLine[] = [];
+class CommandMarker {
+  sizeMarker: number | null = null;
+
+  constructor(sizeMarker: number) {
+    this.Thickness = sizeMarker;
+  }
+
+  set Thickness(sizeMarker: number) {
+    this.sizeMarker = sizeMarker;
+  }
+
+  get Thickness() {
+    return (this.sizeMarker ? this.sizeMarker : 0);
+  }
+}
+
+const lineCommands: CommandLine[] = [];
+const lineCommandsUndone: CommandLine[] = [];
+const markerCommand: CommandMarker = new CommandMarker(2);
 
 /* **** **** **** ****
  * FUNCTIONS
@@ -65,7 +82,7 @@ let isDirty: boolean = true;
 
 function redraw() {
   context.clearRect(0, 0, canvas.width, canvas.height);
-  commands.forEach((command) => command.display(context));
+  lineCommands.forEach((command) => command.display(context));
   isDirty = false;
 }
 
@@ -87,8 +104,8 @@ redraw();
 // Draw in canvas
 canvas.addEventListener("mousedown", (e) => {
   lineCommandCurrent = new CommandLine(e.offsetX, e.offsetY);
-  commands.push(lineCommandCurrent);
-  commandsUndone.splice(0, commandsUndone.length);
+  lineCommands.push(lineCommandCurrent);
+  lineCommandsUndone.splice(0, lineCommandsUndone.length);
 
   notify("drawing-changed");
 });
@@ -115,13 +132,35 @@ document.body.append(
 /* **** **** **** ****
  * BUTTONS
  * **** **** **** ****/
+const buttonMarkerThin = document.createElement("button");
+buttonMarkerThin.innerHTML = "THIN";
+document.body.append(buttonMarkerThin);
+
+buttonMarkerThin.addEventListener("click", () => {
+  markerCommand.Thickness = 2;
+
+  notify("drawing-changed");
+});
+
+const buttonMarkerThick = document.createElement("button");
+buttonMarkerThick.innerHTML = "THICK";
+document.body.append(buttonMarkerThick);
+
+buttonMarkerThick.addEventListener("click", () => {
+  markerCommand.Thickness = 4;
+
+  notify("drawing-changed");
+});
+
+document.body.append(document.createElement("br"));
+
 const buttonClear = document.createElement("button");
 buttonClear.innerHTML = "CLEAR";
 document.body.append(buttonClear);
 
 buttonClear.addEventListener("click", () => {
-  commands.splice(0, commands.length);
-  commandsUndone.splice(0, commandsUndone.length);
+  lineCommands.splice(0, lineCommands.length);
+  lineCommandsUndone.splice(0, lineCommandsUndone.length);
 
   notify("drawing-changed");
 });
@@ -131,8 +170,8 @@ buttonUndo.innerHTML = "UNDO";
 document.body.append(buttonUndo);
 
 buttonUndo.addEventListener("click", () => {
-  if (commands.length > 0) {
-    commandsUndone.push(commands.pop()!);
+  if (lineCommands.length > 0) {
+    lineCommandsUndone.push(lineCommands.pop()!);
 
     notify("drawing-changed");
   }
@@ -143,8 +182,8 @@ buttonRedo.innerHTML = "REDO";
 document.body.append(buttonRedo);
 
 buttonRedo.addEventListener("click", () => {
-  if (commandsUndone.length > 0) {
-    commands.push(commandsUndone.pop()!);
+  if (lineCommandsUndone.length > 0) {
+    lineCommands.push(lineCommandsUndone.pop()!);
 
     notify("drawing-changed");
   }
