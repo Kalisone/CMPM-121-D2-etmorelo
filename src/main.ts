@@ -11,6 +11,7 @@ document.body.innerHTML = `
 const canvas = document.createElement("canvas");
 canvas.width = 256;
 canvas.height = 256;
+canvas.style.cursor = "none";
 canvas.classList.add("canvas");
 document.body.append(canvas);
 
@@ -67,10 +68,27 @@ class CommandMarker {
   }
 }
 
+class CommandCursor {
+  x: number;
+  y: number;
+
+  constructor(x: number, y: number) {
+    this.x = x;
+    this.y = y;
+  }
+
+  display(context: CanvasRenderingContext2D) {
+    context.beginPath();
+    context.arc(this.x, this.y, 2, 0, 2 * Math.PI);
+    context.stroke();
+  }
+}
+
 const lineCommands: CommandLine[] = [];
 const lineCommandsUndone: CommandLine[] = [];
 const markerCommandThin: CommandMarker = new CommandMarker(2);
 const markerCommandThick: CommandMarker = new CommandMarker(4);
+let cursorCommand: CommandCursor | null = null;
 
 /* **** **** **** ****
  * FUNCTIONS
@@ -84,6 +102,11 @@ let isDirty: boolean = true;
 function redraw() {
   context.clearRect(0, 0, canvas.width, canvas.height);
   lineCommands.forEach((command) => command.display(context));
+
+  if (cursorCommand) {
+    cursorCommand.display(context);
+  }
+
   isDirty = false;
 }
 
@@ -95,6 +118,8 @@ function markDirty() {
 }
 
 canvas.addEventListener("drawing-changed", markDirty);
+canvas.addEventListener("tool-moved", markDirty);
+
 let lineCommandCurrent: CommandLine | null = null;
 let markerCommandCurrent: CommandMarker = markerCommandThin;
 
@@ -103,7 +128,8 @@ redraw();
 /* **** **** **** ****
  * EVENT LISTENERS
  * **** **** **** ****/
-// Draw in canvas
+// DRAWING IN CANVAS
+// Click
 canvas.addEventListener("mousedown", (e) => {
   lineCommandCurrent = new CommandLine(
     e.offsetX,
@@ -116,7 +142,21 @@ canvas.addEventListener("mousedown", (e) => {
   notify("drawing-changed");
 });
 
+// Unclick
+canvas.addEventListener("mouseup", () => {
+  lineCommandCurrent = null;
+
+  notify("drawing-changed");
+});
+
+// CURSOR + DRAWING IN CANVAS
+// Drag
 canvas.addEventListener("mousemove", (e) => {
+  // Cursor
+  cursorCommand = new CommandCursor(e.offsetX, e.offsetY);
+  notify("tool-moved");
+
+  // Drawing in Canvas
   if (e.buttons == 1) {
     lineCommandCurrent!.points.push({
       x: e.offsetX,
@@ -128,10 +168,15 @@ canvas.addEventListener("mousemove", (e) => {
   }
 });
 
-canvas.addEventListener("mouseup", () => {
-  lineCommandCurrent = null;
+// CURSOR
+canvas.addEventListener("mouseout", () => {
+  cursorCommand = null;
+  notify("tool-moved");
+});
 
-  notify("drawing-changed");
+canvas.addEventListener("mouseenter", (e) => {
+  cursorCommand = new CommandCursor(e.offsetX, e.offsetY);
+  notify("tool-moved");
 });
 
 document.body.append(
