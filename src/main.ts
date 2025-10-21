@@ -236,13 +236,37 @@ buttonStickerCookie.innerHTML = "🍪";
 document.body.append(buttonStickerCookie);
 buttons_markerTool.push(buttonStickerCookie);
 
-document.body.append(document.createElement("br"));
-
 buttonStickerCookie.addEventListener("click", () => {
   switchSelectedButton(buttonStickerCookie, buttons_markerTool, "selectedTool");
+
+  notify("drawing-changed");
+});
+
+const buttonStickerStar = document.createElement("button");
+buttonStickerStar.innerHTML = "⭐";
+document.body.append(buttonStickerStar);
+buttons_markerTool.push(buttonStickerStar);
+
+buttonStickerStar.addEventListener("click", () => {
+  switchSelectedButton(buttonStickerStar, buttons_markerTool, "selectedTool");
+
+  notify("drawing-changed");
+});
+
+const buttonStickerSkull = document.createElement("button");
+buttonStickerSkull.innerHTML = "💀";
+document.body.append(buttonStickerSkull);
+buttons_markerTool.push(buttonStickerSkull);
+
+buttonStickerSkull.addEventListener("click", () => {
+  switchSelectedButton(buttonStickerSkull, buttons_markerTool, "selectedTool");
+
+  notify("drawing-changed");
 });
 
 // ACTION CHANGES (CLEAR, UNDO, REDO)
+document.body.append(document.createElement("br"));
+
 const buttonClear = document.createElement("button");
 buttonClear.innerHTML = "CLEAR";
 document.body.append(buttonClear);
