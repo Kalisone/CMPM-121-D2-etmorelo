@@ -27,7 +27,7 @@ class CommandLine {
     this.points = [{ x, y, lw }];
   }
 
-  display(context: CanvasRenderingContext2D) {
+  draw(context: CanvasRenderingContext2D) {
     if (!this.points[0]) {
       return;
     }
@@ -56,14 +56,14 @@ class CommandMarker {
   sizeMarker: number | null = null;
 
   constructor(sizeMarker: number) {
-    this.Thickness = sizeMarker;
+    this.thickness = sizeMarker;
   }
 
-  set Thickness(sizeMarker: number) {
+  set thickness(sizeMarker: number) {
     this.sizeMarker = sizeMarker;
   }
 
-  get Thickness() {
+  get thickness() {
     return (this.sizeMarker ? this.sizeMarker : 0);
   }
 }
@@ -106,7 +106,7 @@ class CommandCursor {
       context.arc(
         this.x,
         this.y,
-        markerCommandCurrent.Thickness,
+        markerCommandCurrent.thickness,
         0,
         2 * Math.PI,
       );
@@ -120,11 +120,10 @@ class CommandCursor {
   }
 }
 
-const lineCommands: CommandLine[] = [];
-const lineCommandsUndone: CommandLine[] = [];
+const drawCommands: (CommandLine | CommandSticker)[] = [];
+const drawCommandsUndone: (CommandLine | CommandSticker)[] = [];
 const markerCommandThin: CommandMarker = new CommandMarker(2);
 const markerCommandThick: CommandMarker = new CommandMarker(4);
-const stickerCommands: CommandSticker[] = [];
 let cursorCommand: CommandCursor | null = null;
 
 /* **** **** **** ****
@@ -138,8 +137,7 @@ let isDirty: boolean = true;
 
 function redraw() {
   context.clearRect(0, 0, canvas.width, canvas.height);
-  lineCommands.forEach((command) => command.display(context));
-  stickerCommands.forEach((command) => command.draw(context));
+  drawCommands.forEach((command) => command.draw(context));
 
   if (cursorCommand) {
     cursorCommand.draw(context);
@@ -190,18 +188,18 @@ canvas.addEventListener("mousedown", (e) => {
     lineCommandCurrent = new CommandLine(
       e.offsetX,
       e.offsetY,
-      markerCommandCurrent.Thickness,
+      markerCommandCurrent.thickness,
     );
-    lineCommands.push(lineCommandCurrent);
-    lineCommandsUndone.splice(0, lineCommandsUndone.length);
+    drawCommands.push(lineCommandCurrent);
   } else if (marker) {
     stickerCommandCurrent = new CommandSticker(
       e.offsetX,
       e.offsetY,
       marker.innerHTML,
     );
-    stickerCommands.push(stickerCommandCurrent);
+    drawCommands.push(stickerCommandCurrent);
   }
+  drawCommandsUndone.splice(0, drawCommandsUndone.length);
 
   notify("drawing-changed");
 });
@@ -230,7 +228,7 @@ canvas.addEventListener("mousemove", (e) => {
       lineCommandCurrent!.points.push({
         x: e.offsetX,
         y: e.offsetY,
-        lw: markerCommandCurrent.Thickness,
+        lw: markerCommandCurrent.thickness,
       });
     } else if (marker) {
       stickerCommandCurrent!.drag(e.offsetX, e.offsetY);
@@ -295,9 +293,8 @@ buttonStickerCookie.innerHTML = "🍪";
 document.body.append(buttonStickerCookie);
 buttons_markerTool.push(buttonStickerCookie);
 
-buttonStickerCookie.addEventListener("click", (e) => {
+buttonStickerCookie.addEventListener("click", () => {
   switchSelectedButton(buttonStickerCookie, buttons_markerTool, "selectedTool");
-  stickerCommands.push(new CommandSticker(e.x, e.y, "🍪"));
 
   notify("tool-moved");
 });
@@ -307,9 +304,8 @@ buttonStickerStar.innerHTML = "⭐";
 document.body.append(buttonStickerStar);
 buttons_markerTool.push(buttonStickerStar);
 
-buttonStickerStar.addEventListener("click", (e) => {
+buttonStickerStar.addEventListener("click", () => {
   switchSelectedButton(buttonStickerStar, buttons_markerTool, "selectedTool");
-  stickerCommands.push(new CommandSticker(e.x, e.y, "⭐"));
 
   notify("tool-moved");
 });
@@ -319,9 +315,8 @@ buttonStickerSkull.innerHTML = "💀";
 document.body.append(buttonStickerSkull);
 buttons_markerTool.push(buttonStickerSkull);
 
-buttonStickerSkull.addEventListener("click", (e) => {
+buttonStickerSkull.addEventListener("click", () => {
   switchSelectedButton(buttonStickerSkull, buttons_markerTool, "selectedTool");
-  stickerCommands.push(new CommandSticker(e.x, e.y, "💀"));
 
   notify("tool-moved");
 });
@@ -334,9 +329,9 @@ buttonClear.innerHTML = "CLEAR";
 document.body.append(buttonClear);
 
 buttonClear.addEventListener("click", () => {
-  lineCommands.splice(0, lineCommands.length);
-  lineCommandsUndone.splice(0, lineCommandsUndone.length);
-  stickerCommands.splice(0, stickerCommands.length);
+  drawCommands.splice(0, drawCommands.length);
+  drawCommandsUndone.splice(0, drawCommandsUndone.length);
+  drawCommands.splice(0, drawCommands.length);
 
   notify("drawing-changed");
 });
@@ -346,8 +341,8 @@ buttonUndo.innerHTML = "UNDO";
 document.body.append(buttonUndo);
 
 buttonUndo.addEventListener("click", () => {
-  if (lineCommands.length > 0) {
-    lineCommandsUndone.push(lineCommands.pop()!);
+  if (drawCommands.length > 0) {
+    drawCommandsUndone.push(drawCommands.pop()!);
 
     notify("drawing-changed");
   }
@@ -358,8 +353,8 @@ buttonRedo.innerHTML = "REDO";
 document.body.append(buttonRedo);
 
 buttonRedo.addEventListener("click", () => {
-  if (lineCommandsUndone.length > 0) {
-    lineCommands.push(lineCommandsUndone.pop()!);
+  if (drawCommandsUndone.length > 0) {
+    drawCommands.push(drawCommandsUndone.pop()!);
 
     notify("drawing-changed");
   }
