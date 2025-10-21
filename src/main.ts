@@ -78,10 +78,25 @@ class CommandCursor {
   }
 
   draw(context: CanvasRenderingContext2D) {
-    context.beginPath();
-    context.arc(this.x, this.y, markerCommandCurrent.Thickness, 0, 2 * Math.PI);
-    context.lineWidth = 1;
-    context.stroke();
+    const marker = buttons_markerTool.find((b) =>
+      b.classList.contains("selectedTool")
+    );
+
+    if (marker === buttonMarkerThin || marker === buttonMarkerThick) {
+      context.beginPath();
+      context.arc(
+        this.x,
+        this.y,
+        markerCommandCurrent.Thickness,
+        0,
+        2 * Math.PI,
+      );
+      context.lineWidth = 1;
+      context.stroke();
+    } else if (marker) {
+      context.font = "16px monospace";
+      context.fillText(`.${marker.innerHTML}`, this.x - 4, this.y + 1);
+    }
   }
 }
 
@@ -239,7 +254,7 @@ buttons_markerTool.push(buttonStickerCookie);
 buttonStickerCookie.addEventListener("click", () => {
   switchSelectedButton(buttonStickerCookie, buttons_markerTool, "selectedTool");
 
-  notify("drawing-changed");
+  notify("tool-moved");
 });
 
 const buttonStickerStar = document.createElement("button");
@@ -250,7 +265,7 @@ buttons_markerTool.push(buttonStickerStar);
 buttonStickerStar.addEventListener("click", () => {
   switchSelectedButton(buttonStickerStar, buttons_markerTool, "selectedTool");
 
-  notify("drawing-changed");
+  notify("tool-moved");
 });
 
 const buttonStickerSkull = document.createElement("button");
@@ -261,7 +276,7 @@ buttons_markerTool.push(buttonStickerSkull);
 buttonStickerSkull.addEventListener("click", () => {
   switchSelectedButton(buttonStickerSkull, buttons_markerTool, "selectedTool");
 
-  notify("drawing-changed");
+  notify("tool-moved");
 });
 
 // ACTION CHANGES (CLEAR, UNDO, REDO)
