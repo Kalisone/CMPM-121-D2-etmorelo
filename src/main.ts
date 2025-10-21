@@ -68,6 +68,25 @@ class CommandMarker {
   }
 }
 
+class CommandSticker {
+  sticker: string;
+  point: { x: number; y: number };
+  constructor(x: number, y: number, sticker: string) {
+    this.point = { x, y };
+    this.sticker = sticker;
+  }
+
+  draw(context: CanvasRenderingContext2D) {
+    context.font = "32px";
+    context.fillStyle = "rgba(255, 255, 255, 1)";
+    context.fillText(this.sticker, this.point.x, this.point.y);
+  }
+
+  drag(x: number, y: number) {
+    this.point = { x, y };
+  }
+}
+
 class CommandCursor {
   x: number;
   y: number;
@@ -94,8 +113,9 @@ class CommandCursor {
       context.lineWidth = 1;
       context.stroke();
     } else if (marker) {
-      context.font = "16px monospace";
-      context.fillText(`.${marker.innerHTML}`, this.x - 4, this.y + 1);
+      context.font = "32px monospace";
+      context.fillStyle = "rgba(255, 255, 255, 0.60)";
+      context.fillText(marker.innerHTML, this.x, this.y);
     }
   }
 }
@@ -104,6 +124,7 @@ const lineCommands: CommandLine[] = [];
 const lineCommandsUndone: CommandLine[] = [];
 const markerCommandThin: CommandMarker = new CommandMarker(2);
 const markerCommandThick: CommandMarker = new CommandMarker(4);
+const stickerCommands: CommandSticker[] = [];
 let cursorCommand: CommandCursor | null = null;
 
 /* **** **** **** ****
@@ -118,6 +139,7 @@ let isDirty: boolean = true;
 function redraw() {
   context.clearRect(0, 0, canvas.width, canvas.height);
   lineCommands.forEach((command) => command.display(context));
+  stickerCommands.forEach((command) => command.draw(context));
 
   if (cursorCommand) {
     cursorCommand.draw(context);
@@ -145,27 +167,41 @@ function switchSelectedButton(
   selected.classList.add(classListName);
 }
 
+/* **** **** **** ****
+ * CANVAS CHANGES (EVENT LISTENERS)
+ * **** **** **** ****/
 canvas.addEventListener("drawing-changed", markDirty);
 canvas.addEventListener("tool-moved", markDirty);
 
 let lineCommandCurrent: CommandLine | null = null;
 let markerCommandCurrent: CommandMarker = markerCommandThin;
+let stickerCommandCurrent: CommandSticker | null = null;
 
 redraw();
 
-/* **** **** **** ****
- * CANVAS CHANGES (EVENT LISTENERS)
- * **** **** **** ****/
 // DRAWING IN CANVAS
 // Click
 canvas.addEventListener("mousedown", (e) => {
-  lineCommandCurrent = new CommandLine(
-    e.offsetX,
-    e.offsetY,
-    markerCommandCurrent.Thickness,
+  const marker = buttons_markerTool.find((b) =>
+    b.classList.contains("selectedTool")
   );
-  lineCommands.push(lineCommandCurrent);
-  lineCommandsUndone.splice(0, lineCommandsUndone.length);
+
+  if (marker === buttonMarkerThin || marker === buttonMarkerThick) {
+    lineCommandCurrent = new CommandLine(
+      e.offsetX,
+      e.offsetY,
+      markerCommandCurrent.Thickness,
+    );
+    lineCommands.push(lineCommandCurrent);
+    lineCommandsUndone.splice(0, lineCommandsUndone.length);
+  } else if (marker) {
+    stickerCommandCurrent = new CommandSticker(
+      e.offsetX,
+      e.offsetY,
+      marker.innerHTML,
+    );
+    stickerCommands.push(stickerCommandCurrent);
+  }
 
   notify("drawing-changed");
 });
@@ -173,6 +209,7 @@ canvas.addEventListener("mousedown", (e) => {
 // Unclick
 canvas.addEventListener("mouseup", () => {
   lineCommandCurrent = null;
+  stickerCommandCurrent = null;
 
   notify("drawing-changed");
 });
@@ -186,11 +223,18 @@ canvas.addEventListener("mousemove", (e) => {
 
   // Drawing in Canvas
   if (e.buttons == 1) {
-    lineCommandCurrent!.points.push({
-      x: e.offsetX,
-      y: e.offsetY,
-      lw: markerCommandCurrent.Thickness,
-    });
+    const marker = buttons_markerTool.find((b) =>
+      b.classList.contains("selectedTool")
+    );
+    if (marker === buttonMarkerThin || marker === buttonMarkerThick) {
+      lineCommandCurrent!.points.push({
+        x: e.offsetX,
+        y: e.offsetY,
+        lw: markerCommandCurrent.Thickness,
+      });
+    } else if (marker) {
+      stickerCommandCurrent!.drag(e.offsetX, e.offsetY);
+    }
 
     notify("drawing-changed");
   }
@@ -251,8 +295,9 @@ buttonStickerCookie.innerHTML = "🍪";
 document.body.append(buttonStickerCookie);
 buttons_markerTool.push(buttonStickerCookie);
 
-buttonStickerCookie.addEventListener("click", () => {
+buttonStickerCookie.addEventListener("click", (e) => {
   switchSelectedButton(buttonStickerCookie, buttons_markerTool, "selectedTool");
+  stickerCommands.push(new CommandSticker(e.x, e.y, "🍪"));
 
   notify("tool-moved");
 });
@@ -262,8 +307,9 @@ buttonStickerStar.innerHTML = "⭐";
 document.body.append(buttonStickerStar);
 buttons_markerTool.push(buttonStickerStar);
 
-buttonStickerStar.addEventListener("click", () => {
+buttonStickerStar.addEventListener("click", (e) => {
   switchSelectedButton(buttonStickerStar, buttons_markerTool, "selectedTool");
+  stickerCommands.push(new CommandSticker(e.x, e.y, "⭐"));
 
   notify("tool-moved");
 });
@@ -273,8 +319,9 @@ buttonStickerSkull.innerHTML = "💀";
 document.body.append(buttonStickerSkull);
 buttons_markerTool.push(buttonStickerSkull);
 
-buttonStickerSkull.addEventListener("click", () => {
+buttonStickerSkull.addEventListener("click", (e) => {
   switchSelectedButton(buttonStickerSkull, buttons_markerTool, "selectedTool");
+  stickerCommands.push(new CommandSticker(e.x, e.y, "💀"));
 
   notify("tool-moved");
 });
@@ -289,6 +336,7 @@ document.body.append(buttonClear);
 buttonClear.addEventListener("click", () => {
   lineCommands.splice(0, lineCommands.length);
   lineCommandsUndone.splice(0, lineCommandsUndone.length);
+  stickerCommands.splice(0, stickerCommands.length);
 
   notify("drawing-changed");
 });
