@@ -305,6 +305,10 @@ for (let i = 0; i < 3; i++) {
   });
 }
 
+const buttonStickerCustom = document.createElement("button");
+buttonStickerCustom.innerHTML = "[CUSTOM]";
+document.body.append(buttonStickerCustom);
+
 // ACTION CHANGES (CLEAR, UNDO, REDO)
 document.body.append(document.createElement("br"));
 
