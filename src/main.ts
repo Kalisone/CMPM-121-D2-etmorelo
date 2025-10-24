@@ -288,38 +288,22 @@ buttonMarkerThick.addEventListener("click", () => {
 document.body.append(document.createElement("br"));
 
 // MARKER STICKERS (EMOJIS)
-const buttonStickerCookie = document.createElement("button");
-buttonStickerCookie.innerHTML = "🍪";
-document.body.append(buttonStickerCookie);
-buttons_markerTool.push(buttonStickerCookie);
+const buttonStickers: HTMLButtonElement[] = [];
+const stickers: string[] = ["🍪", "⭐", "💀"];
+for (let i = 0; i < 3; i++) {
+  const buttonSticker = document.createElement("button");
+  buttonSticker.innerHTML = stickers[i]!;
+  document.body.append(buttonSticker);
 
-buttonStickerCookie.addEventListener("click", () => {
-  switchSelectedButton(buttonStickerCookie, buttons_markerTool, "selectedTool");
+  buttons_markerTool.push(buttonSticker);
+  buttonStickers.push(buttonSticker);
 
-  notify("tool-moved");
-});
+  buttonSticker.addEventListener("click", () => {
+    switchSelectedButton(buttonSticker, buttons_markerTool, "selectedTool");
 
-const buttonStickerStar = document.createElement("button");
-buttonStickerStar.innerHTML = "⭐";
-document.body.append(buttonStickerStar);
-buttons_markerTool.push(buttonStickerStar);
-
-buttonStickerStar.addEventListener("click", () => {
-  switchSelectedButton(buttonStickerStar, buttons_markerTool, "selectedTool");
-
-  notify("tool-moved");
-});
-
-const buttonStickerSkull = document.createElement("button");
-buttonStickerSkull.innerHTML = "💀";
-document.body.append(buttonStickerSkull);
-buttons_markerTool.push(buttonStickerSkull);
-
-buttonStickerSkull.addEventListener("click", () => {
-  switchSelectedButton(buttonStickerSkull, buttons_markerTool, "selectedTool");
-
-  notify("tool-moved");
-});
+    notify("tool-moved");
+  });
+}
 
 // ACTION CHANGES (CLEAR, UNDO, REDO)
 document.body.append(document.createElement("br"));
