@@ -115,7 +115,7 @@ class CommandCursor {
     } else if (marker) {
       context.font = "32px monospace";
       context.fillStyle = "rgba(255, 255, 255, 0.60)";
-      context.fillText(marker.innerHTML, this.x, this.y);
+      context.fillText(marker.dataset.sticker!, this.x, this.y);
     }
   }
 }
@@ -190,17 +190,19 @@ canvas.addEventListener("mousedown", (e) => {
       e.offsetY,
       markerCommandCurrent.thickness,
     );
+
     drawCommands.push(lineCommandCurrent);
   } else if (marker) {
     stickerCommandCurrent = new CommandSticker(
       e.offsetX,
       e.offsetY,
-      marker.innerHTML,
+      marker.dataset.sticker!,
     );
+
     drawCommands.push(stickerCommandCurrent);
   }
-  drawCommandsUndone.splice(0, drawCommandsUndone.length);
 
+  drawCommandsUndone.splice(0, drawCommandsUndone.length);
   notify("drawing-changed");
 });
 
@@ -224,6 +226,7 @@ canvas.addEventListener("mousemove", (e) => {
     const marker = buttons_markerTool.find((b) =>
       b.classList.contains("selectedTool")
     );
+
     if (marker === buttonMarkerThin || marker === buttonMarkerThick) {
       lineCommandCurrent!.points.push({
         x: e.offsetX,
@@ -289,9 +292,12 @@ document.body.append(document.createElement("br"));
 
 // MARKER STICKERS (EMOJIS)
 const stickers: string[] = ["🍪", "⭐", "💀"];
+const stickersBaseLen = stickers.length;
+
 for (let i = 0; i < 3; i++) {
   const buttonSticker = document.createElement("button");
   buttonSticker.innerHTML = stickers[i]!;
+  buttonSticker.dataset.sticker = stickers[i];
   document.body.append(buttonSticker);
 
   buttons_markerTool.push(buttonSticker);
@@ -306,6 +312,29 @@ for (let i = 0; i < 3; i++) {
 const buttonStickerCustom = document.createElement("button");
 buttonStickerCustom.innerHTML = "[CUSTOM]";
 document.body.append(buttonStickerCustom);
+
+buttonStickerCustom.addEventListener("click", () => {
+  const sticker = prompt("Enter custom sticker");
+
+  if (sticker) {
+    while (stickers.length > stickersBaseLen) {
+      stickers.pop();
+    }
+
+    stickers.push(sticker);
+  }
+
+  buttonStickerCustom.innerHTML = stickers[stickers.length - 1]!;
+  buttonStickerCustom.dataset.sticker = stickers[stickers.length - 1];
+  buttons_markerTool.push(buttonStickerCustom);
+  console.log(sticker);
+
+  switchSelectedButton(buttonStickerCustom, buttons_markerTool, "selectedTool");
+
+  if (sticker) {
+    notify("tool-moved");
+  }
+});
 
 // ACTION CHANGES (CLEAR, UNDO, REDO)
 document.body.append(document.createElement("br"));
