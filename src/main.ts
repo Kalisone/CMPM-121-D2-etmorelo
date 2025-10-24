@@ -288,7 +288,6 @@ buttonMarkerThick.addEventListener("click", () => {
 document.body.append(document.createElement("br"));
 
 // MARKER STICKERS (EMOJIS)
-const buttonStickers: HTMLButtonElement[] = [];
 const stickers: string[] = ["🍪", "⭐", "💀"];
 for (let i = 0; i < 3; i++) {
   const buttonSticker = document.createElement("button");
@@ -296,7 +295,6 @@ for (let i = 0; i < 3; i++) {
   document.body.append(buttonSticker);
 
   buttons_markerTool.push(buttonSticker);
-  buttonStickers.push(buttonSticker);
 
   buttonSticker.addEventListener("click", () => {
     switchSelectedButton(buttonSticker, buttons_markerTool, "selectedTool");
