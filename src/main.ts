@@ -21,7 +21,7 @@ const context = canvas.getContext("2d")!;
  * COMMANDS
  * **** **** **** ****/
 class CommandLine {
-  points: { x: number; y: number; lw: number }[];
+  private points: { x: number; y: number; lw: number }[];
 
   constructor(x: number, y: number, lw: number) {
     this.points = [{ x, y, lw }];
@@ -50,10 +50,14 @@ class CommandLine {
   grow(x: number, y: number, lw: number) {
     this.points.push({ x, y, lw });
   }
+
+  get Points() {
+    return this.points;
+  }
 }
 
 class CommandMarker {
-  sizeMarker: number | null = null;
+  private sizeMarker: number | null = null;
 
   constructor(sizeMarker: number) {
     this.thickness = sizeMarker;
@@ -69,15 +73,18 @@ class CommandMarker {
 }
 
 class CommandSticker {
-  sticker: string;
-  point: { x: number; y: number };
+  private sticker: string;
+  private point: { x: number; y: number };
+  private size: number;
+
   constructor(x: number, y: number, sticker: string) {
     this.point = { x, y };
     this.sticker = sticker;
+    this.size = 32;
   }
 
   draw(context: CanvasRenderingContext2D) {
-    context.font = "32px";
+    context.font = `${String(this.size)}px sans-serif`;
     context.fillStyle = "rgba(255, 255, 255, 1)";
     context.fillText(this.sticker, this.point.x, this.point.y);
   }
@@ -85,11 +92,19 @@ class CommandSticker {
   drag(x: number, y: number) {
     this.point = { x, y };
   }
+
+  get Size() {
+    return this.size;
+  }
+
+  set Size(size: number) {
+    this.size = size;
+  }
 }
 
 class CommandCursor {
-  x: number;
-  y: number;
+  private x: number;
+  private y: number;
 
   constructor(x: number, y: number) {
     this.x = x;
@@ -228,7 +243,7 @@ canvas.addEventListener("mousemove", (e) => {
     );
 
     if (marker === buttonMarkerThin || marker === buttonMarkerThick) {
-      lineCommandCurrent!.points.push({
+      lineCommandCurrent!.Points.push({
         x: e.offsetX,
         y: e.offsetY,
         lw: markerCommandCurrent.thickness,
@@ -373,4 +388,29 @@ buttonRedo.addEventListener("click", () => {
 
     notify("drawing-changed");
   }
+});
+
+const buttonExport = document.createElement("button");
+buttonExport.innerHTML = "EXPORT";
+document.body.append(buttonExport);
+
+buttonExport.addEventListener("click", () => {
+  const xCanvas = document.createElement("canvas");
+  const scale = 4;
+
+  xCanvas.width = canvas.width * scale;
+  xCanvas.height = canvas.height * scale;
+
+  const xCtx = xCanvas.getContext("2d")!;
+  xCtx.scale(scale, scale);
+  xCtx.fillStyle = "#ffffff";
+  xCtx.fillRect(0, 0, xCanvas.width, xCanvas.height);
+
+  drawCommands.forEach((command) => command.draw(xCtx));
+
+  const imgDataURL = xCanvas.toDataURL("image/png");
+  const link = document.createElement("a");
+  link.download = "pinta-sketch.png";
+  link.href = imgDataURL;
+  link.click();
 });
