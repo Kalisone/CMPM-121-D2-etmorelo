@@ -71,8 +71,12 @@ class CommandLine {
   }
 
   static randColor() {
-    CommandLine.nextColor = CommandLine
-      .colors[Math.floor(Math.random() * CommandLine.colors.length)]!;
+    const validColors = CommandLine.colors.filter((c) =>
+      c != CommandLine.nextColor
+    );
+
+    CommandLine.nextColor =
+      validColors[Math.floor(Math.random() * validColors.length)]!;
   }
 }
 
