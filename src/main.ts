@@ -21,7 +21,18 @@ const context = canvas.getContext("2d")!;
  * COMMANDS
  * **** **** **** ****/
 class CommandLine {
+  static colors = [
+    "#000000",
+    "#ff0000",
+    "#ffaa00",
+    "#00cc00",
+    "#1240ab",
+    "#7109aa",
+  ];
+  static nextColor = CommandLine.colors[0]!;
+
   private points: { x: number; y: number; lw: number }[];
+  private color = CommandLine.nextColor;
 
   constructor(x: number, y: number, lw: number) {
     this.points = [{ x, y, lw }];
@@ -32,7 +43,7 @@ class CommandLine {
       return;
     }
 
-    context.strokeStyle = "black";
+    context.strokeStyle = this.color;
     context.beginPath();
 
     const { x, y } = { x: this.points[0].x, y: this.points[0].y };
@@ -53,6 +64,15 @@ class CommandLine {
 
   get Points() {
     return this.points;
+  }
+
+  get Color() {
+    return this.color;
+  }
+
+  static randColor() {
+    CommandLine.nextColor = CommandLine
+      .colors[Math.floor(Math.random() * CommandLine.colors.length)]!;
   }
 }
 
@@ -125,7 +145,8 @@ class CommandCursor {
         0,
         2 * Math.PI,
       );
-      context.lineWidth = 1;
+      context.lineWidth = 2;
+      context.strokeStyle = CommandLine.nextColor;
       context.stroke();
     } else if (marker) {
       context.font = "32px monospace";
@@ -178,6 +199,8 @@ function switchSelectedButton(
   }
 
   selected.classList.add(classListName);
+
+  CommandLine.randColor();
 }
 
 /* **** **** **** ****
