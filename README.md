@@ -1,9 +1,11 @@
 # CMPM 121 D2 Sticker Sketchpad
 
-Interactable canvas that supports the following:
+An interactable canvas with several tools.
 
-Line Tool: draw with Thin or Thick lines
+## Tools
 
-Sticker Tool: draw with 3 preset stickers (uses emoji strings), option for a custom sticker
-	
-Actions: Undo, Redo, Clear, Export (1024x1024 png)
+Line Tool: Draw with "thin" or "thick" lines.
+
+Sticker Tool: Draw with 3 preset stickers (uses emoji strings). Has an option for a custom sticker.
+
+Actions: Undo, Redo, Clear, Export (1024x1024 png).
