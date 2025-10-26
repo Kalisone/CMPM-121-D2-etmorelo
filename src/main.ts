@@ -2,7 +2,9 @@ import "./style.css";
 
 document.body.innerHTML = `
   <h1>Pinta Lite</h1>
-  <hr><br>
+  <hr>
+  <a href="https://emojipedia.org/" target="_blank">Grab a sticker here</a>
+  <br><br>
 `;
 
 /* **** **** **** ****
