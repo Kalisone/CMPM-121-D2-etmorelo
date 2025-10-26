@@ -303,7 +303,10 @@ buttonMarkerThick.addEventListener("click", () => {
   notify("drawing-changed");
 });
 
-document.body.append(document.createElement("br"));
+document.body.append(
+  document.createElement("br"),
+  document.createElement("br"),
+);
 
 // MARKER STICKERS (EMOJIS: BUILT-IN, CUSTOM)
 const stickers: string[] = ["🎃", "🕸️", "💀"];
@@ -352,7 +355,10 @@ buttonStickerCustom.addEventListener("click", () => {
 });
 
 // ACTION CHANGES (CLEAR, UNDO, REDO, EXPORT)
-document.body.append(document.createElement("br"));
+document.body.append(
+  document.createElement("br"),
+  document.createElement("br"),
+);
 
 const buttonClear = document.createElement("button");
 buttonClear.innerHTML = "CLEAR";
@@ -415,11 +421,17 @@ buttonExport.addEventListener("click", () => {
   link.click();
 });
 
-document.body.append(document.createElement("br"));
+// LINK
+document.body.append(
+  document.createElement("br"),
+  document.createElement("br"),
+  document.createElement("br"),
+);
 
 const buttonEmojiLink = document.createElement("button");
 buttonEmojiLink.innerHTML = "Emojipedia";
 document.body.append(buttonEmojiLink);
+buttonEmojiLink.classList.add("buttonLink");
 
 buttonEmojiLink.addEventListener("click", () => {
   globalThis.open("https://emojipedia.org/");

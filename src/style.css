@@ -1,5 +1,39 @@
+@keyframes rgbAnim {
+  0% {
+    box-shadow: 0 0 8px 4px rgb(255, 0, 0);
+  }
+  17% {
+    box-shadow: 0 0 8px 4px rgb(255, 170, 0);
+  }
+  33% {
+    box-shadow: 0 0 8px 4px rgb(255, 255, 0);
+  }
+  50% {
+    box-shadow: 0 0 8px 4px rgb(0, 204, 0);
+  }
+  67% {
+    box-shadow: 0 0 16px 8px rgb(18, 64, 171);
+  }
+  83% {
+    box-shadow: 0 0 12px 6px rgb(113, 9, 170);
+  }
+  100% {
+    box-shadow: 0 0 8px 4px rgb(255, 0, 0);
+  }
+}
+
 .canvas {
-  box-shadow: 0px 0px 4px 2px #000000f0;
+  box-shadow: 0 0;
+  background-color: #ffffff;
+  animation-name: rgbAnim;
+  animation-duration: 6s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+body {
+  background-color: #2a2a36;
+  color: white;
 }
 
 h1 {
@@ -8,13 +42,23 @@ h1 {
 }
 
 button {
-  background-color: #2a2a36;
-  border-color: #ffffff;
+  background-color: #37323d;
+  border-color: #f0f0ff;
   border-radius: 2px;
   padding: 8px 12px;
-  color: #f0f0ff;
+  color: #ffffff;
   font-size: 18px;
   font-family: "Monaco", monospace;
+}
+
+.buttonLink {
+  background-color: #ffa600;
+  border-color: #000000;
+  border-radius: 4px;
+  padding: 8px 12px;
+  color: #5929a6;
+  font-size: 18px;
+  font-family: "Trebuchet MS", sans-serif;
 }
 
 .selectedTool {
