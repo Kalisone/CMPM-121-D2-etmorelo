@@ -2,9 +2,7 @@ import "./style.css";
 
 document.body.innerHTML = `
   <h1>Pinta Lite</h1>
-  <hr>
-  <a href="https://emojipedia.org/" target="_blank">Grab a sticker here</a>
-  <br><br>
+  <hr><br>
 `;
 
 /* **** **** **** ****
@@ -307,8 +305,8 @@ buttonMarkerThick.addEventListener("click", () => {
 
 document.body.append(document.createElement("br"));
 
-// MARKER STICKERS (EMOJIS)
-const stickers: string[] = ["🍪", "⭐", "💀"];
+// MARKER STICKERS (EMOJIS: BUILT-IN, CUSTOM)
+const stickers: string[] = ["🎃", "🕸️", "💀"];
 const stickersBaseLen = stickers.length;
 
 for (let i = 0; i < 3; i++) {
@@ -353,7 +351,7 @@ buttonStickerCustom.addEventListener("click", () => {
   }
 });
 
-// ACTION CHANGES (CLEAR, UNDO, REDO)
+// ACTION CHANGES (CLEAR, UNDO, REDO, EXPORT)
 document.body.append(document.createElement("br"));
 
 const buttonClear = document.createElement("button");
@@ -415,4 +413,14 @@ buttonExport.addEventListener("click", () => {
   link.download = "pinta-sketch.png";
   link.href = imgDataURL;
   link.click();
+});
+
+document.body.append(document.createElement("br"));
+
+const buttonEmojiLink = document.createElement("button");
+buttonEmojiLink.innerHTML = "Emojipedia";
+document.body.append(buttonEmojiLink);
+
+buttonEmojiLink.addEventListener("click", () => {
+  globalThis.open("https://emojipedia.org/");
 });
