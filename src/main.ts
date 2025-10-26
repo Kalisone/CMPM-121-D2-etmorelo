@@ -372,7 +372,6 @@ buttonStickerCustom.addEventListener("click", () => {
   buttonStickerCustom.innerHTML = stickers[stickers.length - 1]!;
   buttonStickerCustom.dataset.sticker = stickers[stickers.length - 1];
   buttons_markerTool.push(buttonStickerCustom);
-  console.log(sticker);
 
   switchSelectedButton(buttonStickerCustom, buttons_markerTool, "selectedTool");
 
